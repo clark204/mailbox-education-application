@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-bungee: 'Bungee', sans-serif;
+
+    --color-primary: #212055;
+    --color-secondary: #33298a;
+    --color-third: #6147b0;
+    --color-surface: #9566be;
+    --color-bg: #c794e5;
+    --color-text-white: #fdfdfd;
+    --color-text-black: #333333; 
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 20px;
+  --b: 3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fdfdfd;
+  -webkit-mask:
+    repeating-conic-gradient(#0000 0deg,#000 1deg 70deg,#0000 71deg 90deg),
+    radial-gradient(farthest-side,#0000 calc(100% - var(--b) - 1px),#000 calc(100% - var(--b)));
+  -webkit-mask-composite: destination-in;
+          mask-composite: intersect;
+  animation: l5 1s infinite;
+}
+@keyframes l5 {to{transform: rotate(.5turn)}}
+
+#message-editor:empty:before {
+    content: attr(data-placeholder);
+    color: rgba(255,255,255,0.25);
+    pointer-events: none;
+}

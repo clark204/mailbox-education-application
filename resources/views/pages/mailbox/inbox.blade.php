@@ -1,0 +1,153 @@
+@extends('layouts.mailbox')
+
+@section('mailbox.content')
+    <section id="inbox">
+        <x-nav-inbox :inbox="$inbox" />
+
+        {{-- Tab Nav --}}
+        <nav class="flex h-12 border-b border-gray-200 font-medium text-sm" role="tablist">
+            <a href="{{ route('view.primary') }}" role="tab" aria-selected="true" aria-controls="tab-primary"
+                class="cursor-pointer relative flex-1 flex flex-col items-center justify-center text-gray-500">
+                <span
+                    class="flex items-center gap-2 h-full {{ request()->routeIs('view.primary') ? 'text-blue-600' : 'text-gray-500' }}">
+                    <x-heroicon-s-inbox class="size-4" aria-hidden="true" />
+                    Primary
+                </span>
+                @if (request()->routeIs('view.primary'))
+                    <span class="absolute bottom-0 border border-blue-600 w-full rounded-t-full"></span>
+                @endif
+            </a>
+            <a href="{{ route('view.important') }}" role="tab" aria-selected="false" aria-controls="tab-important"
+                class="cursor-pointer relative flex-1 flex flex-col items-center justify-center text-gray-500">
+                <span
+                    class="flex items-center gap-2 h-full {{ request()->routeIs('view.important') ? 'text-blue-600' : 'text-gray-500' }}">
+                    <x-heroicon-s-star class="size-4 text-amber-400" aria-hidden="true" />
+                    Important
+                </span>
+                @if (request()->routeIs('view.important'))
+                    <span class="absolute bottom-0 border border-blue-600 w-full rounded-t-full"></span>
+                @endif
+            </a>
+        </nav>
+
+        @yield('mailbox.tab')
+    </section>
+@endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const selectAll = document.getElementById('select-all');
+
+        function rowCheckboxes() {
+            return document.querySelectorAll('.row-checkbox');
+        }
+
+        function updateSelectAllState() {
+            const all = rowCheckboxes();
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+
+            if (checked.length === 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            } else if (checked.length === all.length) {
+                selectAll.checked = true;
+                selectAll.indeterminate = false;
+            } else {
+                selectAll.checked = false;
+                selectAll.indeterminate = true;
+            }
+
+            updateToolbar();
+        }
+
+        selectAll.addEventListener('change', function () {
+            rowCheckboxes().forEach(cb => cb.checked = this.checked);
+            updateSelectAllState();
+        });
+
+        document.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('row-checkbox')) return;
+            updateSelectAllState();
+        });
+
+        window.selectByFilter = function (filter) {
+            rowCheckboxes().forEach(cb => {
+                switch (filter) {
+                    case 'all': cb.checked = true; break;
+                    case 'read': cb.checked = cb.dataset.read === 'true'; break;
+                    case 'unread': cb.checked = cb.dataset.read === 'false'; break;
+                    case 'important': cb.checked = cb.dataset.important === 'true'; break;
+                }
+            });
+            updateSelectAllState();
+            document.getElementById('select-dropdown').classList.add('hidden');
+        }
+
+        document.addEventListener('click', function (e) {
+            const dropdown = document.getElementById('select-dropdown');
+            const trigger = document.querySelector('[onclick="toggleSelectDropdown()"]');
+            if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        window.toggleSelectDropdown = function () {
+            document.getElementById('select-dropdown').classList.toggle('hidden');
+        }
+
+        const toolbarOptions = document.getElementById('toolbar-options');
+        const selectionActions = document.getElementById('selection-actions');
+
+        function updateToolbar() {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+
+            if (checked.length > 0) {
+                toolbarOptions.classList.add('hidden');
+                selectionActions.classList.remove('hidden');
+                selectionActions.classList.add('flex');
+            } else {
+                toolbarOptions.classList.remove('hidden');
+                selectionActions.classList.add('hidden');
+                selectionActions.classList.remove('flex');
+            }
+        }
+
+        function getSelectedIds() {
+            return [...document.querySelectorAll('.row-checkbox:checked')]
+                .map(cb => cb.value);
+        }
+
+        window.bulkAction = function (action) {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("mail.bulk-update") }}';
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = action;
+            form.appendChild(actionInput);
+
+            ids.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'message_ids[]';
+                input.value = id;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+</script>
