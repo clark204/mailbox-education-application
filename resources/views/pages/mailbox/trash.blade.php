@@ -50,11 +50,12 @@
                         <x-heroicon-o-trash class="size-4" aria-hidden="true" />
                         <span class="text-xs ml-1">Forever</span>
                     </button>
-                    <button onclick="bulkAction('mark_unread')" type="button" aria-label="Mark as unread"
+                    <button onclick="bulkAction(getMarkAction())" type="button" id="mark-btn" aria-label="Mark as unread"
                         title="Mark unread"
                         class="relative size-9 rounded-xl hover:bg-blue-50 hover:text-blue-500 transition-all duration-150 flex items-center justify-center cursor-pointer">
-                        <div class="absolute top-2.5 right-2 size-1.5 bg-blue-500 rounded-full"></div>
-                        <x-heroicon-o-envelope class="size-4" aria-hidden="true" />
+                        <div id="mark-dot" class="absolute top-2.5 right-2 size-1.5 bg-blue-500 rounded-full"></div>
+                        <x-heroicon-o-envelope id="mark-icon-unread" class="size-4" aria-hidden="true" />
+                        <x-heroicon-o-envelope-open id="mark-icon-read" class="size-4 hidden" aria-hidden="true" />
                     </button>
                 </div>
             </div>
@@ -166,6 +167,40 @@
             document.getElementById('select-dropdown').classList.toggle('hidden');
         }
 
+        function updateMarkButton() {
+            const checked = [...document.querySelectorAll('.row-checkbox:checked')];
+            if (checked.length === 0) return;
+
+            const allRead = checked.every(cb => cb.dataset.read === 'true');
+
+            const dot = document.getElementById('mark-dot');
+            const iconUnread = document.getElementById('mark-icon-unread');
+            const iconRead = document.getElementById('mark-icon-read');
+            const btn = document.getElementById('mark-btn');
+
+            if (allRead) {
+                // all selected are read → action is mark_unread
+                dot.classList.remove('hidden');
+                iconUnread.classList.remove('hidden');
+                iconRead.classList.add('hidden');
+                btn.title = 'Mark unread';
+                btn.setAttribute('aria-label', 'Mark as unread');
+            } else {
+                // at least one unread → action is mark_read
+                dot.classList.add('hidden');
+                iconUnread.classList.add('hidden');
+                iconRead.classList.remove('hidden');
+                btn.title = 'Mark read';
+                btn.setAttribute('aria-label', 'Mark as read');
+            }
+        }
+
+        window.getMarkAction = function () {
+            const checked = [...document.querySelectorAll('.row-checkbox:checked')];
+            const allRead = checked.every(cb => cb.dataset.read === 'true');
+            return allRead ? 'mark_unread' : 'mark_read';
+        }
+
         const toolbarOptions = document.getElementById('toolbar-options');
         const selectionActions = document.getElementById('selection-actions');
 
@@ -176,6 +211,7 @@
                 toolbarOptions.classList.add('hidden');
                 selectionActions.classList.remove('hidden');
                 selectionActions.classList.add('flex');
+                updateMarkButton();
             } else {
                 toolbarOptions.classList.remove('hidden');
                 selectionActions.classList.add('hidden');

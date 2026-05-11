@@ -167,8 +167,8 @@ class InboxController extends Controller
             'unmark_important' => $inbox->update(['is_important' => false]),
             'archive' => $inbox->update(['is_archived' => true]),
             'unarchive' => $inbox->update(['is_archived' => false]),
-            'delete' => $inbox->update(['is_trash' => true]),
-            'untrash' => $inbox->update(['is_trash' => false]),
+            'delete' => $inbox->update(['is_trash' => true, 'trashed_at' => now()]),
+            'untrash' => $inbox->update(['is_trash' => false, 'trashed_at' => null]),
             'delete_forever' => $inbox->delete(),
         };
 
@@ -199,9 +199,9 @@ class InboxController extends Controller
             'mark_important' => $messages->update(['is_important' => true]),
             'unmark_important' => $messages->update(['is_important' => false]),
             'archive' => $messages->update(['is_archived' => true]),
-            'delete' => $messages->update(['is_trash' => true]),
+            'delete' => $messages->update(['is_trash' => true, 'trashed_at' => now()]),
             'delete_forever' => $messages->delete(),
-            'untrash' => $messages->update(['is_trash' => false]),
+            'untrash' => $messages->update(['is_trash' => false, 'trashed_at' => null]),
             'unarchive' => $messages->update(['is_archived' => false]),
         };
 
@@ -215,6 +215,9 @@ class InboxController extends Controller
             'inp_to' => 'nullable|exists:users,email',
             'inp_subject' => 'nullable|string|max:255',
             'inp_message' => 'nullable|string',
+        ], [
+            'draft_id.exists' => 'The specified draft does not exist.',
+            'inp_to.exists' => 'The specified recipient does not exist.',
         ]);
 
         $receiver = $request->inp_to

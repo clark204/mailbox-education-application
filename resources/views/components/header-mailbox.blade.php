@@ -15,24 +15,22 @@
     </div>
     <div class="flex gap-2 relative">
         <button id="chatbot-btn"
-            class="group relative bg-third border border-surface rounded-full hover:bg-gray-100 transition-all ease-in cursor-pointer">
+            class="group relative bg-third border size-11 border-surface rounded-full hover:bg-gray-100 transition-all ease-in cursor-pointer">
             <img src="{{ asset('chatbot.png') }}" alt="ChatBot AI" class="size-10" />
             <div
                 class="transition-all ease-in group-hover:delay-500 group-hover:opacity-100 absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gray-400 rounded-lg text-sm px-2 whitespace-nowrap opacity-0 pointer-events-none">
                 Chatbot
             </div>
         </button>
-        @if ($user->avatar)
-            <button id="avatar-btn"
-                class="border border-surface bg-gray-100 size-10 rounded-full flex items-center justify-center cursor-pointer">
-                <img src="{{ asset('storage/' . $user->avatar) }}" class="object-cover rounded-full" />
-            </button>
-        @else
-            <button id="avatar-btn"
-                class="border border-surface bg-gray-100 size-10 rounded-full flex items-center justify-center cursor-pointer">
+        <button id="avatar-btn"
+            class="border border-surface bg-gray-100 size-11 rounded-full flex items-center justify-center cursor-pointer">
+            @if ($user->avatar)
+                <img src="{{ asset('storage/' . $user->avatar) }}" class="w-full h-full object-cover rounded-full" />
+            @else
                 <x-heroicon-o-user class="size-8" />
-            </button>
-        @endif
+            @endif
+
+        </button>
         <x-menu-profile />
     </div>
     <x-chatbot />
@@ -48,6 +46,7 @@
         if (navSideMenu.classList.contains('max-lg:hidden')) {
             navSideMenu.classList.remove('max-lg:hidden');
             navSideMenu.classList.add('max-lg:absolute');
+            profileMenu.classList.add('hidden');
         }
     });
 
@@ -64,5 +63,6 @@
         toggleChatbot();
         document.getElementById('compose-window').classList.add('hidden');
         document.getElementById('nav-sidemenu').classList.add('max-lg:hidden');
+        document.getElementById('profile-menu').classList.add('hidden');
     });
 </script>

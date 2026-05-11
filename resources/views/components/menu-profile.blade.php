@@ -9,7 +9,7 @@
     <header class="relative p-4 flex flex-col items-center border-b border-slate-100">
 
         {{-- Close Button --}}
-        <button onclick="toggleProfileMenu()" class="absolute right-2 top-2 p-1 rounded-full text-slate-400
+        <button onclick="toggleProfileMenu()" class="cursor-pointer absolute right-2 top-2 p-1 rounded-full text-slate-400
                 hover:bg-slate-100 hover:text-slate-600 transition-colors
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Close profile menu" role="menuitem">
@@ -33,7 +33,7 @@
         </div>
 
         {{-- User Info --}}
-        <h2 class="mt-3 font-semibold text-slate-800 text-lg">
+        <h2 class="mt-3 font-semibold text-slate-800 text-lg text-center">
             {{ $user->first_name }} {{ $user->last_name }}
         </h2>
         <div class="flex items-center gap-1.5 text-slate-500 mt-0.5">
@@ -47,7 +47,7 @@
     <div class="p-2 space-y-1" role="none">
 
         {{-- Manage Account --}}
-        <a href="" role="menuitem" tabindex="-1" class="text-slate-700 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+        <a href="{{ route('view.profile') }}" role="menuitem" tabindex="-1" class="text-slate-700 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
                 hover:bg-slate-100 hover:text-blue-600 transition-all
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
             <x-heroicon-o-cog-6-tooth class="size-5" aria-hidden="true" />

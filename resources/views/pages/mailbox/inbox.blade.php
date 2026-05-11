@@ -96,6 +96,40 @@
             document.getElementById('select-dropdown').classList.toggle('hidden');
         }
 
+        function updateMarkButton() {
+            const checked = [...document.querySelectorAll('.row-checkbox:checked')];
+            if (checked.length === 0) return;
+
+            const allRead = checked.every(cb => cb.dataset.read === 'true');
+
+            const dot = document.getElementById('mark-dot');
+            const iconUnread = document.getElementById('mark-icon-unread');
+            const iconRead = document.getElementById('mark-icon-read');
+            const btn = document.getElementById('mark-btn');
+
+            if (allRead) {
+                // all selected are read → action is mark_unread
+                dot.classList.remove('hidden');
+                iconUnread.classList.remove('hidden');
+                iconRead.classList.add('hidden');
+                btn.title = 'Mark unread';
+                btn.setAttribute('aria-label', 'Mark as unread');
+            } else {
+                // at least one unread → action is mark_read
+                dot.classList.add('hidden');
+                iconUnread.classList.add('hidden');
+                iconRead.classList.remove('hidden');
+                btn.title = 'Mark read';
+                btn.setAttribute('aria-label', 'Mark as read');
+            }
+        }
+
+        window.getMarkAction = function () {
+            const checked = [...document.querySelectorAll('.row-checkbox:checked')];
+            const allRead = checked.every(cb => cb.dataset.read === 'true');
+            return allRead ? 'mark_unread' : 'mark_read';
+        }
+
         const toolbarOptions = document.getElementById('toolbar-options');
         const selectionActions = document.getElementById('selection-actions');
 
@@ -106,6 +140,7 @@
                 toolbarOptions.classList.add('hidden');
                 selectionActions.classList.remove('hidden');
                 selectionActions.classList.add('flex');
+                updateMarkButton();
             } else {
                 toolbarOptions.classList.remove('hidden');
                 selectionActions.classList.add('hidden');

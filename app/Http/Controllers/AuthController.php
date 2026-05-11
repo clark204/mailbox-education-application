@@ -30,7 +30,7 @@ class AuthController extends Controller
 
             session(['verification_user_id' => $user->id]);
 
-            $error = $this->emailVerification($user);
+            $error = $this->emailVerification($user, false);
             if ($error) {
                 return redirect()->back()->with('error', $error);
             }
@@ -60,7 +60,7 @@ class AuthController extends Controller
 
         session(['verification_user_id' => $user->id]);
 
-        $error = $this->emailVerification($user);
+        $error = $this->emailVerification($user, false);
         if ($error) {
             return redirect()->back()->with('error', $error);
         }
@@ -68,7 +68,7 @@ class AuthController extends Controller
         return redirect()->route('view.verify');
     }
 
-    private function emailVerification(User $user)
+    public static function emailVerification(User $user, $is_forgot)
     {
         $lock = Cache::lock('otp_lock:'.$user->id, 60);
 
@@ -77,7 +77,7 @@ class AuthController extends Controller
         }
 
         $otp = random_int(100000, 999999);
-        Cache::put('otp:'.$user->id, $otp, 300);
+        ! $is_forgot ? Cache::put('otp:'.$user->id, $otp, 300) : Cache::put('forgot_otp:'.$user->id, $otp, 300);
         Mail::to($user->email)->queue(new VerifyMail($user->first_name, $otp));
         Cache::put('otp_resend:'.$user->id, now()->addSeconds(60), 60);
 
@@ -91,19 +91,30 @@ class AuthController extends Controller
         ]);
 
         $userID = session()->get('verification_user_id');
+        $isForgot = session()->get('is_forgot', false);
 
         if (! $userID) {
             return redirect()->route('view.sign-in');
         }
 
-        $storedOTP = Cache::get('otp:'.$userID);
+        $cacheKey = $isForgot ? 'forgot_otp:'.$userID : 'otp:'.$userID;
+        $storedOTP = Cache::get($cacheKey);
 
         if (! $storedOTP) {
             return back()->withErrors(['error' => 'OTP has expired. Please request a new one.']);
         }
 
         if (hash_equals((string) $request->otp, (string) $storedOTP)) {
-            Cache::forget('otp:'.$userID);
+            Cache::forget($cacheKey);
+
+            if ($isForgot) {
+                session()->forget('is_forgot');
+                session(['reset_user_id' => $userID]);
+                session()->forget('verification_user_id');
+
+                return redirect()->route('view.change-password');
+            }
+
             User::where('id', $userID)->update([
                 'is_verified' => true,
                 'email_verified_at' => now(),
@@ -118,12 +129,12 @@ class AuthController extends Controller
         }
 
         return back()->withErrors(['error' => 'Invalid or expired OTP. Please try again.']);
-
     }
 
     public function resendOTP()
     {
         $userID = session()->get('verification_user_id');
+        $isForgot = session()->get('is_forgot', false);
         if (! $userID) {
             return redirect()->route('view.sign-in');
         }
@@ -133,7 +144,7 @@ class AuthController extends Controller
             return redirect()->route('view.sign-in');
         }
 
-        $error = $this->emailVerification($user);
+        $error = $this->emailVerification($user, $isForgot);
         if ($error) {
             return redirect()->back()->with('error', $error);
         }

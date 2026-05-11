@@ -2,14 +2,13 @@
 
 <li id="{{ $message->id }}" class="flex group {{ $message->is_read ? 'font-extralight' : '' }}">
 
-    <a @if ($message->is_draft) 
-        onclick="openCompose({
+    <a @if ($message->is_draft) onclick="openCompose({
         to:       '{{ $message->compose->receiver->email ?? null }}',
         subject:  '{{ addslashes($message->compose->subject) }}',
         message:  `{!! addslashes($message->compose->message) !!}`,
         draft_id: '{{ $message->inbox_id }}'
-    })"@else href="{{ route('view.mail', ['section' => $section, 'inboxID' => $message->inbox_id]) }}" @endif 
-        class="{{ $message->is_read ? 'bg-blue-100 group-hover:bg-blue-100' : 'group-hover:bg-gray-50' }} flex-1 px-4 h-12 border-b border-gray-300 flex gap-2 items-center  cursor-pointer">
+    })" @else href="{{ route('view.mail', ['section' => $section, 'inboxID' => $message->inbox_id]) }}" @endif
+        class="{{ $message->is_read ? 'bg-blue-100 group-hover:bg-blue-100' : 'group-hover:bg-gray-50' }} flex-1 px-4 h-14 border-b border-gray-300 flex gap-2 items-center  cursor-pointer">
 
         <input type="checkbox" name="selected[]" value="{{ $message->inbox_id }}"
             data-read="{{ $message->is_read ? 'true' : 'false' }}"
@@ -42,10 +41,10 @@
             </div>
         </div>
 
-        <div class="ml-2 flex-1 min-w-0 max-lg:flex">
+        <div class="ml-2 flex-1 min-w-0 flex items-centerh-full">
             <p class="text-sm font-medium truncate">{{ $message->compose->subject ?? '(No Subject)' }}</p>
-            <div class="mx-2 lg:hidden text-gray-300">-</div>
-            <p class="text-sm text-gray-500 truncate">{!! $message->compose->message !!}</p>
+            <div class="mx-2">-</div>
+            <p class="text-sm text-gray-800 truncate">{!! $message->compose->message !!}</p>
         </div>
 
         <time class="hidden lg:flex items-center text-xs text-gray-400 shrink-0">

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('is_archived')->default(false);
             $table->boolean('is_trash')->default(false);
             $table->boolean('is_draft')->default(false);
+            $table->timestamp('trashed_at')->nullable();
             $table->timestamps();
         });
     }

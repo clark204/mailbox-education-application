@@ -49,7 +49,7 @@
 
                         {{-- Email --}}
                         <div class="flex flex-col gap-1">
-                            <label for="email">Email/Phone Number</label>
+                            <label for="email">Email</label>
                             <input
                                 class="w-full border h-10 outline-none px-4 rounded ring-offset-1 focus:ring-1 focus:ring-cyan-500 @error('email') border-rose-500 @else border-gray-300 @enderror"
                                 type="email" id="email" name="email" autocomplete="email"

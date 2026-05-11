@@ -52,7 +52,7 @@
                         </div>
 
                         {{-- Forgot Password --}}
-                        <a class="sm:text-sm self-end text-blue-500 hover:underline" href="">
+                        <a href="{{ route('view.forgot-password') }}" class="sm:text-sm self-end text-blue-500 hover:underline" href="">
                             Forgot Password?
                         </a>
 

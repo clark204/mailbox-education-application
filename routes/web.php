@@ -4,6 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\InboxController;
 use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\UserController;
+use App\Http\Middleware\EnsureHasResetSession;
+use App\Http\Middleware\EnsureHasVerificationSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
@@ -21,32 +25,39 @@ Route::middleware('guest')->group(function () {
     Route::get('/google/sign-in', [SocialiteController::class, 'googleRedirect'])->name('auth.google-redirect');
     Route::get('/google/callback', [SocialiteController::class, 'googleCallback'])->name('auth.google-callback');
 
+    Route::prefix('/forgot')->group(function () {
+        Route::get('/', fn () => view('pages.verification.forgot-password'))->name('view.forgot-password');
+        Route::post('/send', [UserController::class, 'forgotSendOTP'])->name('forgot.send-otp');
+        Route::middleware(EnsureHasResetSession::class)->group(function () {
+            Route::get('/account', fn () => view('pages.verification.change-password'))->name('view.change-password');
+            Route::put('/change-password', [UserController::class, 'forgotPassword'])->name('forgot.password');
+        });
+    });
+
     Route::prefix('verify')->group(function () {
-        Route::get('/', function () {
-            $userID = session('verification_user_id');
-            if (! $userID) {
-                return redirect()->route('view.sign-in');
-            }
-
-            $resend = Cache::get('otp_resend:'.$userID);
-            $ttl = $resend ? (int) now()->diffInSeconds($resend) : 0;
-            $ttl = max($ttl, 0);
-
-            return view('pages.verification.index', compact('ttl'));
-        })->name('view.verify');
-        Route::post('/verify', [AuthController::class, 'verifyOTP'])->name('verify.otp');
         Route::get('/forget', function () {
             $userID = session()->get('verification_user_id');
             session()->forget('verification_user_id');
+            session()->forget('is_forgot');
             Cache::forget('otp:'.$userID);
             Cache::forget('otp_resend:'.$userID);
+            Cache::forget('forgot_otp:'.$userID);
 
             return redirect()->route('view.sign-up');
         })->name('verify.forget');
+        Route::middleware(EnsureHasVerificationSession::class)->group(function () {
+            Route::get('/', function () {
+                $userID = session('verification_user_id');
+                $resend = Cache::get('otp_resend:'.$userID);
+                $ttl = $resend ? (int) now()->diffInSeconds($resend) : 0;
+                $ttl = max($ttl, 0);
 
-        Route::post('/resend-otp', [AuthController::class, 'resendOTP'])->name('verify.resend');
+                return view('pages.verification.email-verify', compact('ttl'));
+            })->name('view.verify');
+            Route::post('/verify', [AuthController::class, 'verifyOTP'])->name('verify.otp');
+            Route::post('/resend-otp', [AuthController::class, 'resendOTP'])->name('verify.resend');
+        });
     });
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -58,6 +69,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/archived', fn () => app(InboxController::class)->inbox('archived'))->name('view.archived');
         Route::get('/trash', fn () => app(InboxController::class)->inbox('trash'))->name('view.trash');
         Route::get('/search', [InboxController::class, 'search'])->name('mail.search');
+
+        Route::prefix('account')->group(function () {
+            Route::get('/', function () {
+                return view('pages.mailbox.profile', ['user' => Auth::user()]);
+            })->name('view.profile');
+            Route::get('/settings', function () {
+                return view('pages.mailbox.account-settings', ['user' => Auth::user()]);
+            })->name('view.account-settings');
+
+            Route::put('/update-profile', [UserController::class, 'update'])->name('user.update');
+            Route::put('/change-password', [UserController::class, 'changePassword'])->name('user.change-password');
+            Route::put('/change-avatar', [UserController::class, 'changeAvatar'])->name('user.change-avatar');
+        });
+
         Route::get('/{section}/{inboxID}', [InboxController::class, 'show'])->name('view.mail');
 
         Route::post('/update', [InboxController::class, 'update'])->name('mail.update');
@@ -68,5 +93,6 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/chatbot/message', [ChatbotController::class, 'message'])->name('chatbot.message');
         Route::post('/chatbot/clear', [ChatbotController::class, 'clearHistory'])->name('chatbot.clear');
+
     });
 });
