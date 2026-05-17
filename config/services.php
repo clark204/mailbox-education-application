@@ -46,4 +46,18 @@ return [
         'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
         'system_prompt' => env('GROQ_SYSTEM_PROMPT', 'You are Clarky AI, a helpful and friendly assistant.'),
     ],
+
+    'repohive_sms' => [
+        'base_url' => env('REPOHIVE_SMS_API_BASE'),
+        'token' => env('REPOHIVE_SMS_API_TOKEN'),
+    ],
+
+    'repohive_email' => [
+        'base_url' => env('REPOHIVE_EMAIL_API_BASE'),
+        'token' => env('REPOHIVE_EMAIL_API_TOKEN'),
+    ],
+        'repohive_assistant' => [
+        'base_url' => env('REPOHIVE_ASSISTANT_API_BASE'),
+        'token' => env('REPOHIVE_ASSISTANT_API_TOKEN'),
+    ],
 ];

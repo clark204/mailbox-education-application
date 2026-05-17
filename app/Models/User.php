@@ -51,4 +51,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function phones(){
+        return $this->hasMany(PhoneModel::class, 'user_id', 'id');
+    }
 }

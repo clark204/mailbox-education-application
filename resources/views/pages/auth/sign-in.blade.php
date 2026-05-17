@@ -24,11 +24,11 @@
 
                         {{-- Email --}}
                         <div class="flex flex-col gap-1">
-                            <label for="email">Email</label>
+                            <label for="login">Email/Phone Number</label>
                             <input
-                                class="w-full border border-gray-300 h-10 outline-none px-4 rounded ring-offset-1 focus:ring-1 focus:ring-cyan-500 @error('email') border-red-500 @enderror"
-                                type="email" id="email" name="email" autocomplete="email"
-                                value="{{ old('email') }}" required aria-required="true" oninput="clearInputs()" />
+                                class="w-full border border-gray-300 h-10 outline-none px-4 rounded ring-offset-1 focus:ring-1 focus:ring-cyan-500 @error('password') border-red-500 @enderror"
+                                type="login" id="login" name="login" autocomplete="login"
+                                value="{{ old('login') }}" required aria-required="true" oninput="clearInputs()" />
                         </div>
 
                         {{-- Password --}}

@@ -32,6 +32,7 @@
         <form id="compose-form" action="{{ route('mail.sent') }}" method="POST" class="flex flex-col h-full">
             @csrf
 
+            <input type="hidden" name="idempotency_key" value="{{ Str::uuid() }}">
             {{-- Recipient --}}
             <div class="flex flex-col border-b" style="border-color: rgba(255,255,255,0.08);">
                 <div class="flex items-center gap-3 px-5 py-2.5">

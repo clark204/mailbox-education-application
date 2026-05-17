@@ -2,17 +2,20 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\InboxController;
-use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\EnsureHasResetSession;
 use App\Http\Middleware\EnsureHasVerificationSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', function () {
+    Route::get('/', fn() => redirect()->route('view.sign-in'));
+    Route::get('/sign-in', function () {
         return view('pages.auth.sign-in');
     })->name('view.sign-in');
     Route::get('/sign-up', function () {
@@ -22,8 +25,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/sign-in', [AuthController::class, 'signIn'])->name('auth.sign-in');
     Route::post('/sign-up', [AuthController::class, 'signUp'])->name('auth.sign-up');
 
-    Route::get('/google/sign-in', [SocialiteController::class, 'googleRedirect'])->name('auth.google-redirect');
-    Route::get('/google/callback', [SocialiteController::class, 'googleCallback'])->name('auth.google-callback');
+    Route::get('/google/sign-in', [GoogleController::class, 'googleRedirect'])->name('auth.google-redirect');
+    Route::get('/google/callback', [GoogleController::class, 'googleCallback'])->name('auth.google-callback');
 
     Route::prefix('/forgot')->group(function () {
         Route::get('/', fn () => view('pages.verification.forgot-password'))->name('view.forgot-password');
@@ -81,6 +84,17 @@ Route::middleware('auth')->group(function () {
             Route::put('/update-profile', [UserController::class, 'update'])->name('user.update');
             Route::put('/change-password', [UserController::class, 'changePassword'])->name('user.change-password');
             Route::put('/change-avatar', [UserController::class, 'changeAvatar'])->name('user.change-avatar');
+
+            Route::prefix('contact')->group(function () {
+                Route::post('/sendSMS', [PhoneController::class, 'sendSms'])->name('contact.sendSms');
+                Route::post('/verifyOtp', [PhoneController::class, 'verifyPhone'])->name('contact.verify');
+                Route::post('/forget', function () {
+                    $phone = Session::get('otp_target');
+                    Session::forget(['otp_target', 'otp:'.$phone]);
+
+                    return back();
+                })->name('contact.forget');
+            });
         });
 
         Route::get('/{section}/{inboxID}', [InboxController::class, 'show'])->name('view.mail');
@@ -95,4 +109,5 @@ Route::middleware('auth')->group(function () {
         Route::post('/chatbot/clear', [ChatbotController::class, 'clearHistory'])->name('chatbot.clear');
 
     });
+
 });

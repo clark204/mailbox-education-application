@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function __construct(protected EmailService $emailService){}
+
     public function update(Request $request)
     {
         $request->validate([
@@ -74,7 +77,7 @@ class UserController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        $error = AuthController::emailVerification($user, true);
+        $error = $this->emailService->sendEmail($user, true);
         if ($error) {
             return redirect()->back()->with('error', $error);
         }

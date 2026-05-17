@@ -15,12 +15,12 @@
 </head>
 
 <body>
-    <div class="lg:grid grid-cols-[256px_1fr] grid-rows-1 h-screen">
+    <div class="lg:grid grid-cols-[256px_1fr] grid-rows-1 max-h-screen overflow-hidden">
         <x-nav-sidemenu />
 
-        <main class="bg-primary flex flex-col">
+        <main class="bg-primary flex flex-col h-screen">
             <x-header-mailbox />
-            <div class="flex-1 bg-white lg:rounded-tl-4xl border-t-2 lg:border-l-2 border-third">
+            <div class="flex-1 bg-white min-h-[calc(100vh-64px)] overflow-y-auto lg:rounded-tl-4xl border-t-2 lg:border-l-2 border-third">
                 @yield('mailbox.content')
             </div>
             <x-compose />

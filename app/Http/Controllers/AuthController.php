@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\VerifyMail;
 use App\Models\User;
+use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -12,25 +13,44 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+    protected EmailService $emailService;
+
+    public function __construct(EmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     public function signIn(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'login' => 'required',
             'password' => 'required|min:8',
         ]);
 
-        if (! Auth::attempt($request->only('email', 'password'))) {
-            return back()->withErrors(['email' => ' ', 'password' => 'Invalid email or password.']);
+        $login = trim($request->login);
+
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', $login)->first();
+        } else {
+            $login = preg_replace('/\D/', '', $login);
+
+            $user = User::whereHas('phones', function ($query) use ($login) {
+                $query->where('phone_number', $login);
+            })->first();
         }
 
-        $user = Auth::user();
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['password' => 'Invalid email/phone or password.']);
+        }
+
+        Auth::login($user);
 
         if (! $user->is_verified) {
             Auth::logout();
 
             session(['verification_user_id' => $user->id]);
 
-            $error = $this->emailVerification($user, false);
+            $error = $this->emailService->sendEmail($user, false);
             if ($error) {
                 return redirect()->back()->with('error', $error);
             }
@@ -60,7 +80,7 @@ class AuthController extends Controller
 
         session(['verification_user_id' => $user->id]);
 
-        $error = $this->emailVerification($user, false);
+        $error = $this->emailService->sendEmail($user, false);
         if ($error) {
             return redirect()->back()->with('error', $error);
         }
@@ -144,7 +164,7 @@ class AuthController extends Controller
             return redirect()->route('view.sign-in');
         }
 
-        $error = $this->emailVerification($user, $isForgot);
+        $error = $this->emailService->sendEmail($user, false);
         if ($error) {
             return redirect()->back()->with('error', $error);
         }

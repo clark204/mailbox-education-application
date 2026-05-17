@@ -1,7 +1,7 @@
 @props(['inbox'])
 
 {{-- ── Toolbar ── --}}
-<div class="flex items-center justify-between px-6 h-12 border-b border-gray-200 shrink-0">
+<div class="flex items-center justify-between px-6 h-12 border-b border-gray-200 shrink-0 sticky top-0 bg-white">
     <div class="flex items-center gap-1 h-full">
         {{-- Select all checkbox + dropdown --}}
         <div tabindex="1" class="flex items-center relative h-full py-2">

@@ -175,13 +175,11 @@
             const error = document.getElementById(errorId);
             if (error) error.classList.add('hidden');
         }
-
-        document.querySelector('#register-form').addEventListener('submit', function() {
-            const btn = document.getElementById('register-btn');
+        function loader(btn) {
             document.getElementById('btn-text').classList.add('hidden');
             document.getElementById('btn-loader').classList.remove('hidden');
             btn.classList.add('opacity-75', 'cursor-not-allowed');
             setTimeout(() => btn.disabled = true, 100);
-        });
+        }
     </script>
 @endsection

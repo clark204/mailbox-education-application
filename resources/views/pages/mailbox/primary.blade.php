@@ -2,7 +2,7 @@
 
 @section('mailbox.tab')
     {{-- Email List --}}
-    <ul id="inbox-list" role="list">
+    <ul id="inbox-list" role="list" class="">
         @forelse ($inbox as $message)
             <x-mail-list :message="$message" :section="$section" />
         @empty

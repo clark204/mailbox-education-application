@@ -1,5 +1,5 @@
 <div id="chatbot" style="height: 70vh;"
-    class="hidden fixed bottom-0 right-0 w-full lg:w-[480px] flex-col rounded-t-2xl overflow-hidden shadow-[0_-4px_24px_rgba(0,0,0,0.08)] border border-gray-200 bg-white">
+    class="hidden fixed bottom-0 right-0 z-10 w-full lg:w-[480px] flex-col rounded-t-2xl overflow-hidden shadow-[0_-4px_24px_rgba(0,0,0,0.08)] border border-gray-200 bg-white">
 
     {{-- Header --}}
     <div class="flex items-center justify-between px-4 py-3 bg-primary rounded-t-2xl">
@@ -42,7 +42,8 @@
         <div class="flex justify-start items-end gap-2">
             <img src="{{ asset('chatbot.png') }}" alt="Clarky"
                 class="size-7 rounded-full object-cover border border-gray-200 shrink-0 mb-1">
-            <div class="max-w-[75%] px-4 py-2.5 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm leading-relaxed shadow-sm">
+            <div
+                class="max-w-[75%] px-4 py-2.5 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm leading-relaxed shadow-sm">
                 Hi! I'm Clarky AI 👋 How can I help you today?
             </div>
         </div>
@@ -61,12 +62,12 @@
 
 <script>
     const chatMessages = document.getElementById('chat-messages');
-    const chatInput    = document.getElementById('chat-input');
-    const sendBtn      = document.getElementById('chat-send-btn');
-    const CHAT_URL     = '{{ route("chatbot.message") }}';
-    const CLEAR_URL    = '{{ route("chatbot.clear") }}';
-    const CSRF_TOKEN   = '{{ csrf_token() }}';
-    const AVATAR_URL   = '{{ asset("chatbot.png") }}';
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const CHAT_URL = '{{ route("chatbot.message") }}';
+    const CLEAR_URL = '{{ route("chatbot.clear") }}';
+    const CSRF_TOKEN = '{{ csrf_token() }}';
+    const AVATAR_URL = '{{ asset("chatbot.png") }}';
 
     // ── UI Helpers ──────────────────────────────────────────────
 
@@ -120,6 +121,8 @@
     }
 
     // ── Send Message ────────────────────────────────────────────
+    // let conversationId = null;
+    // let history = [];
 
     async function sendMessage() {
         const text = chatInput.value.trim();
@@ -139,9 +142,14 @@
                 },
                 body: JSON.stringify({ message: text }),
             });
+            //  conversationId: conversationId, history: history,
 
             const data = await res.json();
             removeTypingIndicator();
+
+            // if (data.conversation_id) {
+            //     conversationId = data.conversation_id;
+            // }
 
             if (data.error) {
                 appendMessage('assistant', '⚠️ ' + data.error);
@@ -189,6 +197,9 @@
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': CSRF_TOKEN },
         });
+
+        // conversationId = null;
+        // history = [];
 
         // Reset UI — keep only the greeting
         chatMessages.innerHTML = `

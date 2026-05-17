@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureHasVerificationSession
@@ -15,7 +16,7 @@ class EnsureHasVerificationSession
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!session()->has('verification_user_id')){
+        if (!Session::has('verification_user_id')){
             return redirect()->route('view.sign-in');
         }
         

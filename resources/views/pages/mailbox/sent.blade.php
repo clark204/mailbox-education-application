@@ -1,7 +1,7 @@
 @extends('layouts.mailbox')
 
 @section('mailbox.content')
-    <section id="sent-inbox">
+    <section id="sent-inbox" class="relative">
 
         <x-nav-inbox :inbox="$inbox" />
 

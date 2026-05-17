@@ -7,6 +7,7 @@ use App\Models\InboxModel;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 class InboxController extends Controller
@@ -69,6 +70,14 @@ class InboxController extends Controller
 
     public function store(Request $request)
     {
+        $key = 'compose:'.$request->input('idempotency_id');
+
+        if (Cache::has($key)){
+            return back()->with('error', 'Too many request.');
+        }
+
+        Cache::put($key, true, 60);
+
         $request->validate([
             'inp_to' => 'required|exists:users,email',
             'inp_subject' => 'nullable|string|max:255',
@@ -126,6 +135,7 @@ class InboxController extends Controller
         ]);
 
         return back()->with('success', 'Message sent successfully!');
+
     }
 
     public function show($section, $inboxID)
