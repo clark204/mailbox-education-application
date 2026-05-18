@@ -17,7 +17,8 @@
                 <input type="hidden" name="message_id" value="{{ $inbox->inbox_id }}">
                 <input type="hidden" name="action" id="inp_action">
                 <input type="hidden" name="section" value="{{ $section }}">
-                <button type="submit" aria-label="{{ $inbox->is_trash ? 'Untrash inbox' : 'Archive inbox' }}" title="{{ $inbox->is_trash ? 'Untrash' : 'Archive' }}"
+                <button type="submit" aria-label="{{ $inbox->is_trash ? 'Untrash inbox' : 'Archive inbox' }}"
+                    title="{{ $inbox->is_trash ? 'Untrash' : 'Archive' }}"
                     onclick="document.getElementById('inp_action').value = '{{ $inbox->is_trash ? 'untrash' : 'archive' }}'"
                     class="size-9 rounded-xl hover:bg-gray-100 transition-all duration-150 flex items-center justify-center cursor-pointer">
                     @if ($inbox->is_trash)
@@ -73,8 +74,14 @@
             <div class="flex items-start gap-4 mb-6">
                 {{-- Avatar --}}
                 <div class="shrink-0 size-10 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    <img src="{{ asset('storage/' . $inbox->compose->sender->avatar) }}" alt=""
-                        class="size-10 rounded-full">
+                    @if ($inbox->compose->sender->avatar)
+                        <img src="{{ asset('storage/' . $inbox->compose->sender->avatar) }}" alt=""
+                            class="size-10 rounded-full">
+                    @else
+                        <x-heroicon-s-user
+                            class="relative size-10 rounded-full object-cover border-2 border-white shadow-sm text-slate-600"
+                            aria-hidden="true" />
+                    @endif
                 </div>
 
                 {{-- Meta --}}

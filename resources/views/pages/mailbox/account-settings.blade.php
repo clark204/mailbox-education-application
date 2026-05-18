@@ -38,10 +38,10 @@
                 </label>
                 <input
                     class="{{ $errors->has('new_password') ? 'ring ring-red-500' : 'focus:ring ring-blue-500' }} ring-offset-1 h-10 px-4 outline-none border border-gray-300 rounded-lg"
-                    type="password" name="new_password" id="new_password" {{-- ✅ type="password" --}}
+                    type="password" name="new_password" id="new_password"
                     onkeypress="return /[a-zA-Z\s\'\-]/.test(event.key)" placeholder="Enter new password">
                 @error('new_password')
-                    <p id="new-error" class="text-red-500 text-xs pl-4">{{ $message }}</p> {{-- ✅ dynamic message --}}
+                    <p id="new-error" class="text-red-500 text-xs pl-4">{{ $message }}</p> 
                 @enderror
             </div>
             <div class="flex-1 flex flex-col group">
@@ -51,7 +51,7 @@
                 </label>
                 <input
                     class="{{ $errors->has('new_password') ? 'ring ring-red-500' : 'focus:ring ring-blue-500' }} ring-offset-1 h-10 px-4 outline-none border border-gray-300 rounded-lg"
-                    type="password" name="new_password_confirmation" id="new_password_confirmation" {{-- ✅ type="password"
+                    type="password" name="new_password_confirmation" id="new_password_confirmation"
                     --}} placeholder="Re-enter new password">
             </div>
         </div>

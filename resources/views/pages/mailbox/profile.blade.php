@@ -1,5 +1,8 @@
 @extends('pages.mailbox.manage-account')
 
+@php
+@endphp
+
 @section('manage-account.content')
     <x-modal-contact />
     <x-modal-verify-phone />
@@ -10,22 +13,22 @@
         <div class="flex gap-4">
             <div class="flex-1 flex flex-col group">
                 <label id="fn-label" for="first_name"
-                        class=" {{ $errors->has('first_name') ? 'text-red-500' : 'group-focus-within:text-blue-500 text-gray-800' }}">First
+                    class=" {{ $errors->has('first_name') ? 'text-red-500' : 'group-focus-within:text-blue-500 text-gray-800' }}">First
                     Name</label>
                 <input
                     class="{{ $errors->has('first_name') ? 'ring ring-red-500' : 'focus:ring ring-blue-500' }} ring-offset-1 h-10 px-4 outline-none border border-gray-300 rounded-lg"
-                        type="text" name="first_name" id="first_name" value="{{ $user->first_name }}">
+                    type="text" name="first_name" id="first_name" value="{{ $user->first_name }}">
                 @error('first_name')
                     <p id="fn-error" class="text-red-500 text-xs pl-4">{{ $message }}</p>
                 @enderror
             </div>
             <div class="flex-1 flex flex-col group">
                 <label id="ln-label" for="last_name"
-                        class=" {{ $errors->has('last_name') ? 'text-red-500' : 'group-focus-within:text-blue-500 text-gray-800' }}">Last
+                    class=" {{ $errors->has('last_name') ? 'text-red-500' : 'group-focus-within:text-blue-500 text-gray-800' }}">Last
                     Name</label>
                 <input
                     class="{{ $errors->has('last_name') ? 'ring ring-red-500' : 'focus:ring ring-blue-500' }} ring-offset-1 h-10 px-4 outline-none border border-gray-300 rounded-lg"
-                        type="text" name="last_name" id="last_name" value="{{ $user->last_name }}">
+                    type="text" name="last_name" id="last_name" value="{{ $user->last_name }}">
                 @error('last_name')
                     <p id="ln-error" class="text-red-500 text-xs pl-4">{{ $message }}</p>
                 @enderror
@@ -47,7 +50,14 @@
                     <h2 class="font-medium">
                         Contact Info
                     </h2>
-                    <p class="text-xs shrink-0">No contact number</p>
+                    <div class="flex items-center gap-2">
+                        @forelse ($user->phones as $phone)
+                            <p class="text-xs shrink-0">{{ $phone->phone_number }}</p>
+
+                        @empty
+                            <p class="text-xs shrink-0">No contact number</p>
+                        @endforelse
+                    </div>
                 </div>
                 <span class="flex items-center justify-center">
                     <x-heroicon-s-chevron-right class="size-5" />

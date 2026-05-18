@@ -8,6 +8,7 @@ use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\EnsureHasResetSession;
 use App\Http\Middleware\EnsureHasVerificationSession;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -78,7 +79,7 @@ Route::middleware('auth')->group(function () {
                 return view('pages.mailbox.profile', ['user' => Auth::user()]);
             })->name('view.profile');
             Route::get('/settings', function () {
-                return view('pages.mailbox.account-settings', ['user' => Auth::user()]);
+                return view('pages.mailbox.account-settings', ['user' => User::with('phones')->findOrFail(Auth::id())]);
             })->name('view.account-settings');
 
             Route::put('/update-profile', [UserController::class, 'update'])->name('user.update');

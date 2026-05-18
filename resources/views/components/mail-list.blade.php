@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <div class="ml-2 flex-1 min-w-0 flex items-centerh-full">
+        <div class="ml-2 flex-1 min-w-0 flex items-center h-full">
             <p class="text-sm font-medium truncate">{{ $message->compose->subject ?? '(No Subject)' }}</p>
             <div class="mx-2">-</div>
             <p class="text-sm text-gray-800 truncate">{!! $message->compose->message !!}</p>
