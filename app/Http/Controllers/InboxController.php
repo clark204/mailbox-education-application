@@ -76,7 +76,7 @@ class InboxController extends Controller
             return back()->with('error', 'Too many request.');
         }
 
-        Cache::put($key, true, 60);
+        Cache::put($key, true, 20);
 
         $request->validate([
             'inp_to' => 'required|exists:users,email',

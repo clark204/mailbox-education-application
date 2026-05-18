@@ -82,6 +82,8 @@ class AuthController extends Controller
 
         $error = $this->emailService->sendEmail($user, false);
         if ($error) {
+            $user->delete();
+
             return redirect()->back()->with('error', $error);
         }
 
