@@ -16,6 +16,7 @@ class EmailService
 
         $response = Http::withToken(config('services.repohive_email.token'))
             ->acceptJson()
+            ->retry(PHP_INT_MAX, 2000)
             ->timeout(60)
             ->post(rtrim(config('services.repohive_email.base_url'), '/').'/email/send', [
                 'to' => $user->email,
@@ -30,8 +31,6 @@ class EmailService
             Cache::put('otp_resend:'.$user->id, now()->addSeconds(60), 60);
 
             return null;
-        } else {
-            return self::emailVerification($user, $is_forgot);
         }
 
         return 'Failed to send OTP. Please try again.';
